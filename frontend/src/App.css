@@ -154,6 +154,91 @@ button:disabled {
   cursor: wait;
 }
 
+.auth-shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(46, 170, 110, 0.14), transparent 30%),
+    #07100d;
+}
+
+.auth-card {
+  width: min(430px, 100%);
+  background: #0b1712;
+  border: 1px solid #1a2a23;
+  border-radius: 18px;
+  padding: 36px;
+}
+
+.auth-card h1 {
+  margin: 0;
+  font-size: 34px;
+  letter-spacing: -1px;
+}
+
+.auth-description {
+  color: #92a69d;
+  line-height: 1.6;
+  margin: 12px 0 28px;
+}
+
+.auth-card label {
+  display: block;
+  color: #91a59b;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  margin: 16px 0 8px;
+}
+
+.auth-card input {
+  width: 100%;
+  border: 1px solid #263a31;
+  border-radius: 9px;
+  background: #07100d;
+  color: #e9f3ee;
+  padding: 13px;
+  outline: none;
+}
+
+.auth-card input:focus {
+  border-color: #43c982;
+}
+
+.auth-card form button {
+  width: 100%;
+  margin-top: 24px;
+}
+
+.auth-switch,
+.logout-button {
+  background: transparent;
+  color: #8fd8ae;
+  padding: 6px 0;
+  margin: 14px 0 0;
+  font-size: 12px;
+}
+
+.auth-message {
+  color: #8fd8ae;
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 16px 0 0;
+}
+
+.auth-switch:hover,
+.logout-button:hover {
+  background: transparent;
+  color: #c1f2d4;
+}
+
+.logout-button {
+  margin: 0;
+  color: #91a59b;
+}
+
 .error {
   color: #ff7979;
   margin-bottom: 0;

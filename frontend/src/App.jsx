@@ -1,6 +1,18 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
+
+const API_BASE = `http://${window.location.hostname}:5000`;
+
 function App() {
+  const [authUser, setAuthUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [authMode, setAuthMode] = useState("login");
+  const [authStep, setAuthStep] = useState("credentials");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [otp, setOtp] = useState("");
+  const [authError, setAuthError] = useState("");
+  const [authMessage, setAuthMessage] = useState("");
   const [optimizationMode, setOptimizationMode] = useState("balanced");
   const [task, setTask] = useState("");
   const [loading, setLoading] = useState(false);
@@ -8,6 +20,86 @@ function App() {
   const [offlineMode, setOfflineMode] = useState(false);
   const [error, setError] = useState("");
   const [isEditingTask, setIsEditingTask] = useState(true);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/auth/me`, { credentials: "include" })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.authenticated) {
+          setAuthUser(data);
+        }
+      })
+      .finally(() => setAuthLoading(false));
+  }, []);
+
+  const submitAuth = async (event) => {
+    event.preventDefault();
+    setAuthError("");
+
+    try {
+      const response = await fetch(`${API_BASE}/api/auth/${authMode}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || "Authentication failed");
+      if (authMode === "register") {
+        setAuthMode("login");
+        setAuthMessage(data.message);
+      } else {
+        setAuthStep("otp");
+        setAuthMessage(`A verification code was sent to ${data.email}.`);
+      }
+      setPassword("");
+    } catch (err) {
+      setAuthError(err.message);
+    }
+  };
+
+  const verifyOtp = async (event) => {
+    event.preventDefault();
+    setAuthError("");
+
+    try {
+      const response = await fetch(`${API_BASE}/api/auth/verify-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ otp }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || "Verification failed");
+      setAuthUser(data);
+      setOtp("");
+    } catch (err) {
+      setAuthError(err.message);
+    }
+  };
+
+  const resendOtp = async () => {
+    setAuthError("");
+    const response = await fetch(`${API_BASE}/api/auth/resend-otp`, {
+      method: "POST",
+      credentials: "include",
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      setAuthError(data.message || "Unable to resend code");
+      return;
+    }
+    setAuthMessage("A new verification code was sent.");
+  };
+
+  const logout = async () => {
+    await fetch(`${API_BASE}/api/auth/logout`, {
+      method: "POST",
+      credentials: "include",
+    });
+    setAuthUser(null);
+    setResult(null);
+  };
 
   const optimizeWorkflow = async () => {
     if (!task.trim()) {
@@ -21,12 +113,13 @@ function App() {
 
     try {
       const response = await fetch(
-        "http://127.0.0.1:5000/api/analyze-and-schedule",
+        `${API_BASE}/api/analyze-and-schedule`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
+          credentials: "include",
           body: JSON.stringify({
             task: task,
             optimization_mode: optimizationMode,
@@ -50,6 +143,93 @@ function App() {
     }
   };
 
+  if (authLoading) {
+    return <div className="auth-shell">Loading GreenRoute...</div>;
+  }
+
+  if (!authUser) {
+    return (
+      <div className="auth-shell">
+        <section className="auth-card">
+          <p className="eyebrow">GREENROUTE</p>
+          <h1>
+            {authStep === "otp"
+              ? "Check your email"
+              : authMode === "login"
+                ? "Welcome back"
+                : "Create your account"}
+          </h1>
+          <p className="auth-description">
+            {authStep === "otp"
+              ? "Enter the 6-digit code to finish signing in."
+              : "Sign in to optimize AI workflows with a lower resource footprint."}
+          </p>
+          {authStep === "otp" ? (
+            <form onSubmit={verifyOtp}>
+              <label htmlFor="otp">VERIFICATION CODE</label>
+              <input
+                id="otp"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]{6}"
+                maxLength={6}
+                value={otp}
+                onChange={(event) => setOtp(event.target.value.replace(/\D/g, ""))}
+                required
+                autoComplete="one-time-code"
+              />
+              <button type="submit">VERIFY CODE</button>
+              <button type="button" className="auth-switch" onClick={resendOtp}>
+                RESEND CODE
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={submitAuth}>
+              <label htmlFor="email">EMAIL</label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                required
+                autoComplete="email"
+              />
+              <label htmlFor="password">PASSWORD</label>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                required
+                minLength={8}
+                autoComplete={authMode === "login" ? "current-password" : "new-password"}
+              />
+              <button type="submit">
+                {authMode === "login" ? "CONTINUE TO EMAIL VERIFICATION" : "CREATE ACCOUNT"}
+              </button>
+            </form>
+          )}
+          {authMessage && <p className="auth-message">{authMessage}</p>}
+          {authError && <p className="error">{authError}</p>}
+          {authStep === "credentials" && (
+            <button
+              className="auth-switch"
+              onClick={() => {
+                setAuthMode(authMode === "login" ? "register" : "login");
+                setAuthError("");
+                setAuthMessage("");
+              }}
+            >
+              {authMode === "login"
+                ? "Need an account? Register"
+                : "Already have an account? Sign in"}
+            </button>
+          )}
+        </section>
+      </div>
+    );
+  }
+
   return (
     <div className="app">
       <header className="header">
@@ -60,7 +240,8 @@ function App() {
 
         <div className="status">
           <span className="status-dot"></span>
-          Scheduler Online
+          <span>{authUser.email}</span>
+          <button className="logout-button" onClick={logout}>SIGN OUT</button>
         </div>
       </header>
 
@@ -401,15 +582,6 @@ function Metric({ label, value }) {
     <div className="metric">
       <span>{label}</span>
       <strong>{value}</strong>
-    </div>
-  );
-}
-
-function FlowStep({ title, text }) {
-  return (
-    <div className="flow-step">
-      <span>{title}</span>
-      <strong>{text}</strong>
     </div>
   );
 }
