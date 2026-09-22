@@ -5,6 +5,7 @@ function App() {
   const [task, setTask] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
+  const [offlineMode, setOfflineMode] = useState(false);
   const [error, setError] = useState("");
   const [isEditingTask, setIsEditingTask] = useState(true);
 
@@ -40,6 +41,7 @@ function App() {
       }
 
       setResult(data);
+      setOfflineMode(data.offline);
       setIsEditingTask(false);
     } catch (err) {
       setError(err.message);
@@ -110,6 +112,9 @@ function App() {
               <div>
                 <label>AI WORKFLOW TASK</label>
                 <p>{task}</p>
+                <span className="selected-mode">
+                MODE · {optimizationMode.replace("-", " ").toUpperCase()}
+              </span>
               </div>
 
               <button
@@ -124,6 +129,14 @@ function App() {
 
         {result && result.schedule && result.schedule.selected ? (
            <>
+           
+
+          <div className={`connection-status ${offlineMode ? "offline" : "online"}`}>
+            <span className="status-dot"></span>
+            {offlineMode
+              ? "OFFLINE FALLBACK · LOCAL ANALYZER"
+              : "ONLINE · GEMINI ANALYZER"}
+          </div>
             <section className="requirements">
               <h3>Task Analysis</h3>
 

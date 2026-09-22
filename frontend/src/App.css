@@ -630,3 +630,38 @@ td {
 .input-card select + button {
   margin-top: 4px;
 }
+.selected-mode {
+  display: inline-block;
+  margin-top: 7px;
+  color: #50d991;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+}
+.connection-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 8px;
+  padding: 6px 10px;
+  border: 1px solid #17372a;
+  border-radius: 6px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+}
+
+.connection-status.online {
+  color: #50d991;
+}
+
+.connection-status.offline {
+  color: #f0b35b;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}

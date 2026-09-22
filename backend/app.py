@@ -4,7 +4,7 @@ from flask_cors import CORS
 
 from scheduler import schedule_task, schedule_workflow
 from gemini_analyzer import analyze_task
-
+from offline_analyzer import analyze_task_offline
 app = Flask(__name__)
 CORS(app)
 
@@ -61,7 +61,17 @@ def analyze_and_schedule():
         MODES["balanced"]
     )
     # Step 1: Gemini understands the task
-    requirements = analyze_task(task)
+    try:
+        requirements = analyze_task(task)
+        analysis_source = "Gemini"
+        offline = False
+
+    except Exception as e:
+        print(f"Gemini unavailable. Using offline fallback: {e}")
+
+        requirements = analyze_task_offline(task)
+        analysis_source = "Local Offline Fallback"
+        offline = True
 
     # Step 2: Local scheduler optimizes execution
     required_accuracy = min(requirements.recommended_accuracy, 96)
@@ -128,7 +138,9 @@ def analyze_and_schedule():
         "requirements": requirements.model_dump(),
         "schedule": result,
         "impact": impact,
-        "workflow": workflow
+        "workflow": workflow,
+        "analysis_source": analysis_source,
+        "offline": offline
     })
 
 
