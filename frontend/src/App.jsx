@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "./App.css";
-
 function App() {
+  const [optimizationMode, setOptimizationMode] = useState("balanced");
   const [task, setTask] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
@@ -28,6 +28,7 @@ function App() {
           },
           body: JSON.stringify({
             task: task,
+            optimization_mode: optimizationMode,
           }),
         }
       );
@@ -84,7 +85,19 @@ function App() {
               onChange={(e) => setTask(e.target.value)}
               placeholder="Example: Analyze 5000 customer reviews and summarize the major complaints."
             />
+            <label>OPTIMIZATION MODE</label>
 
+              <select
+                value={optimizationMode}
+                onChange={(e) => setOptimizationMode(e.target.value)}
+              >
+                <option value="balanced">Balanced</option>
+                <option value="carbon">Carbon First</option>
+                <option value="latency">Latency First</option>
+                <option value="cost">Cost First</option>
+                <option value="energy">Energy First</option>
+              </select>
+          
             <button onClick={optimizeWorkflow} disabled={loading}>
               {loading ? "ANALYZING..." : "OPTIMIZE WORKFLOW →"}
             </button>
@@ -195,7 +208,40 @@ function App() {
                 />
               </div>
             </section>
+            <section className="impact-card">
+                  <div className="section-heading">
+                    <div>
+                      <p className="eyebrow">RESOURCE IMPACT</p>
+                      <h3>GreenRoute Impact</h3>
+                    </div>
+                  </div>
 
+                  {result.impact && (
+                    <>
+                      <div className="impact-grid">
+                        <div>
+                          <span>CARBON REDUCTION</span>
+                          <strong>{result.impact.carbon_reduction}%</strong>
+                        </div>
+
+                        <div>
+                          <span>COST REDUCTION</span>
+                          <strong>{result.impact.cost_reduction}%</strong>
+                        </div>
+
+                        <div>
+                          <span>ENERGY REDUCTION</span>
+                          <strong>{result.impact.energy_reduction}%</strong>
+                        </div>
+                      </div>
+
+                      <p className="impact-note">
+                        Compared with the highest-resource feasible configuration.
+                        Values are simulated estimates.
+                      </p>
+                    </>
+                  )}
+                </section>  
             <section className="alternatives">
               <div className="section-heading">
                 <div>
@@ -273,7 +319,7 @@ function App() {
                         <span className="step-label">{step.name}</span>
                         <p>{step.description}</p>
                         <div className="step-reason">
-                          {step.schedule.reason}
+                          {step.reason}
                           </div>
                       </div>
 

@@ -159,7 +159,8 @@ def schedule_workflow(urgency="normal", can_be_delayed=True):
             "priority": "high",
             "carbon_weight": 2,
             "cost_weight": 2,
-            "energy_weight": 2
+            "energy_weight": 2,
+            "reason_hint": "A lightweight configuration is sufficient for classification while keeping latency and resource usage low."
         },
         {
             "name": "Retrieve",
@@ -169,7 +170,8 @@ def schedule_workflow(urgency="normal", can_be_delayed=True):
             "priority": "high",
             "carbon_weight": 2,
             "cost_weight": 2,
-            "energy_weight": 2
+            "energy_weight": 2,
+            "reason_hint": "Fast execution is preferred because retrieval is latency-sensitive and does not require the highest-capability configuration."
         },
         {
             "name": "Analyze",
@@ -179,7 +181,8 @@ def schedule_workflow(urgency="normal", can_be_delayed=True):
             "priority": urgency,
             "carbon_weight": 3 if urgency != "low" else 5,
             "cost_weight": 2,
-            "energy_weight": 2
+            "energy_weight": 2,
+            "reason_hint": "Higher-capability execution is justified because this step requires deeper reasoning and higher accuracy."
         },
         {
             "name": "Generate",
@@ -189,7 +192,8 @@ def schedule_workflow(urgency="normal", can_be_delayed=True):
             "priority": generate_priority,
             "carbon_weight": generate_carbon_weight,
             "cost_weight": 2,
-            "energy_weight": 2
+            "energy_weight": 2,
+            "reason_hint": "The selected configuration meets the generation requirements without using more resources than necessary."
         }
     ]
 
@@ -208,6 +212,7 @@ def schedule_workflow(urgency="normal", can_be_delayed=True):
         workflow.append({
             "name": step["name"],
             "description": step["description"],
+            "reason": step["reason_hint"],
             "schedule": result
         })
 
