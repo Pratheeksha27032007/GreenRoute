@@ -6,6 +6,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
+  const [isEditingTask, setIsEditingTask] = useState(true);
 
   const optimizeWorkflow = async () => {
     if (!task.trim()) {
@@ -38,6 +39,7 @@ function App() {
       }
 
       setResult(data);
+      setIsEditingTask(false);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -73,21 +75,39 @@ function App() {
           </div>
         </section>
 
-        <section className="input-card">
-          <label>AI WORKFLOW TASK</label>
+        {isEditingTask || !result ? (
+          <section className="input-card">
+            <label>AI WORKFLOW TASK</label>
 
-          <textarea
-            value={task}
-            onChange={(e) => setTask(e.target.value)}
-            placeholder="Example: Analyze 5000 customer reviews and summarize the major complaints."
-          />
+            <textarea
+              value={task}
+              onChange={(e) => setTask(e.target.value)}
+              placeholder="Example: Analyze 5000 customer reviews and summarize the major complaints."
+            />
 
-          <button onClick={optimizeWorkflow} disabled={loading}>
-            {loading ? "ANALYZING..." : "OPTIMIZE WORKFLOW →"}
-          </button>
+            <button onClick={optimizeWorkflow} disabled={loading}>
+              {loading ? "ANALYZING..." : "OPTIMIZE WORKFLOW →"}
+            </button>
 
-          {error && <p className="error">{error}</p>}
-        </section>
+            {error && <p className="error">{error}</p>}
+          </section>
+        ) : (
+          <section className="input-card collapsed-input-card">
+            <div className="collapsed-task">
+              <div>
+                <label>AI WORKFLOW TASK</label>
+                <p>{task}</p>
+              </div>
+
+              <button
+                className="edit-task-button"
+                onClick={() => setIsEditingTask(true)}
+              >
+                EDIT TASK
+              </button>
+            </div>
+          </section>
+        )}
 
         {result && result.schedule && result.schedule.selected ? (
            <>

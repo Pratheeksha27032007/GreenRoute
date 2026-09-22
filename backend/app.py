@@ -33,8 +33,10 @@ def analyze_and_schedule():
     requirements = analyze_task(task)
 
     # Step 2: Local scheduler optimizes execution
+    required_accuracy = min(requirements.recommended_accuracy, 96)
+
     result = schedule_task(
-        required_accuracy=requirements.recommended_accuracy,
+        required_accuracy=required_accuracy,
         max_latency=20,
         priority=requirements.urgency,
         carbon_weight=5 if requirements.can_be_delayed else 2,

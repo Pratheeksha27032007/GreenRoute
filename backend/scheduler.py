@@ -1,7 +1,7 @@
 CONFIGURATIONS = [
     {
         "id": "flash-edge-now",
-        "model": "Gemini Flash",
+        "model": "Gemini Flash Lite",
         "location": "Edge",
         "timing": "Now",
         "latency": 2.1,
@@ -12,7 +12,7 @@ CONFIGURATIONS = [
     },
     {
         "id": "flash-cloud-now",
-        "model": "Gemini Flash",
+        "model": "Gemini Flash Lite",
         "location": "Cloud",
         "timing": "Now",
         "latency": 3.5,
@@ -23,7 +23,7 @@ CONFIGURATIONS = [
     },
     {
         "id": "flash-cloud-later",
-        "model": "Gemini Flash",
+        "model": "Gemini Flash Lite",
         "location": "Cloud",
         "timing": "Later",
         "latency": 15.0,
@@ -34,7 +34,7 @@ CONFIGURATIONS = [
     },
     {
         "id": "advanced-cloud-now",
-        "model": "More Capable Gemini",
+        "model": "Gemini Flash",
         "location": "Cloud",
         "timing": "Now",
         "latency": 4.8,
@@ -45,7 +45,7 @@ CONFIGURATIONS = [
     },
     {
         "id": "advanced-cloud-later",
-        "model": "More Capable Gemini",
+        "model": "Gemini Flash",
         "location": "Cloud",
         "timing": "Later",
         "latency": 17.0,

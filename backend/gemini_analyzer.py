@@ -25,16 +25,23 @@ class TaskRequirements(BaseModel):
 def analyze_task(task):
 
     prompt = f"""
-Analyze this AI task for a workflow scheduler:
+    Analyze this AI task for a workflow scheduler:
 
 {task}
 
-Classify the task based on its complexity, required accuracy,
-urgency, and whether execution can be delayed.
-"""
+    Classify the task based on:
+    - complexity
+    - required accuracy
+    - urgency
+    - whether execution can be delayed
+
+    For recommended_accuracy, use a value between 85 and 96,
+    because the scheduler's available configurations support
+    accuracy levels up to 96%.
+    """
 
     response = client.models.generate_content(
-        model="gemini-3.5-flash-lite",
+        model="gemini-3.6-flash",
         contents=prompt,
         config=types.GenerateContentConfig(
             response_mime_type="application/json",
